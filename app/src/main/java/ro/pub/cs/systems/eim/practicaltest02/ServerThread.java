@@ -72,11 +72,17 @@ public class ServerThread extends Thread {
                     if (!map.containsKey(socket.getRemoteSocketAddress().toString().split(":")[0].substring(1))) {
                         writer.println("none");
                     }
+                    else if (map.get(socket.getRemoteSocketAddress().toString().split(":")[0].substring(1)).compareTo("active") == 0) {
+                        writer.println("active");
+                        Log.v("SERVER", "Deja activa");
+                    }
                     else {
                         String ipTime = map.get(socket.getRemoteSocketAddress().toString().split(":")[0].substring(1));
 
                         if (date.getHours() > Integer.parseInt(ipTime.split(" ")[0]) || (date.getHours() == Integer.parseInt(ipTime.split(" ")[0]) && date.getMinutes() > Integer.parseInt(ipTime.split(" ")[1]))) {
                             writer.println("active");
+                            map.remove(socket.getRemoteSocketAddress().toString().split(":")[0].substring(1));
+                            map.put(socket.getRemoteSocketAddress().toString().split(":")[0].substring(1), "active");
                         }
                         else {
                             writer.println("inactive");
