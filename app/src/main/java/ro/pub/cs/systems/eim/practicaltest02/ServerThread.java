@@ -6,6 +6,8 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 public class ServerThread extends Thread {
@@ -54,14 +56,33 @@ public class ServerThread extends Thread {
                     Log.v("SEVER", "POLL");
                     Socket serviceSocket = new Socket("utcnist.colorado.edu", 13);
                     BufferedReader serviceReader = Utilities.getReader(serviceSocket);
-                    //PrintWriter serviceWriter = Utilities.getWriter(serviceSocket);
-                    Log.v("SERVER", socket.getRemoteSocketAddress().toString().split(":")[0].substring(1) + " " + map.get(socket.getRemoteSocketAddress().toString().split(":")[0].substring(1)));
-                    //serviceWriter.println(map.get(socket.getRemoteSocketAddress().toString().split(":")[0]));
-                    //12serviceWriter.println(map.get(socket.getRemoteSocketAddress().toString().split(":")[0]).split("\\s+")[1]);
+
+                    //Log.v("SERVER", socket.getRemoteSocketAddress().toString().split(":")[0].substring(1) + " " + map.get(socket.getRemoteSocketAddress().toString().split(":")[0].substring(1)));
+
                     String time = serviceReader.readLine();
-                    Log.v("SERVER", time);
-                    writer.println(time);
+
+                    while (time == null || time.isEmpty()) {
+                        time = serviceReader.readLine();
+                    }
+
                     serviceSocket.close();
+
+                    Date date = new SimpleDateFormat("yy-MM-dd HH:mm:ss").parse(time.substring(5, 22));
+
+                    if (!map.containsKey(socket.getRemoteSocketAddress().toString().split(":")[0].substring(1))) {
+                        writer.println("none");
+                    }
+                    else {
+                        String ipTime = map.get(socket.getRemoteSocketAddress().toString().split(":")[0].substring(1));
+
+                        if (date.getHours() > Integer.parseInt(ipTime.split(" ")[0]) || (date.getHours() == Integer.parseInt(ipTime.split(" ")[0]) && date.getMinutes() > Integer.parseInt(ipTime.split(" ")[1]))) {
+                            writer.println("active");
+                        }
+                        else {
+                            writer.println("inactive");
+                        }
+                    }
+
                 }
 
                 socket.close();
