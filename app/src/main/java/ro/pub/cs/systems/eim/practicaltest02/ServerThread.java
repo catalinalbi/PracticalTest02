@@ -54,20 +54,6 @@ public class ServerThread extends Thread {
                 }
                 else if (buttonType.compareTo("poll") == 0) {
                     Log.v("SEVER", "POLL");
-                    Socket serviceSocket = new Socket("utcnist.colorado.edu", 13);
-                    BufferedReader serviceReader = Utilities.getReader(serviceSocket);
-
-                    //Log.v("SERVER", socket.getRemoteSocketAddress().toString().split(":")[0].substring(1) + " " + map.get(socket.getRemoteSocketAddress().toString().split(":")[0].substring(1)));
-
-                    String time = serviceReader.readLine();
-
-                    while (time == null || time.isEmpty()) {
-                        time = serviceReader.readLine();
-                    }
-
-                    serviceSocket.close();
-
-                    Date date = new SimpleDateFormat("yy-MM-dd HH:mm:ss").parse(time.substring(5, 22));
 
                     if (!map.containsKey(socket.getRemoteSocketAddress().toString().split(":")[0].substring(1))) {
                         writer.println("none");
@@ -77,6 +63,21 @@ public class ServerThread extends Thread {
                         Log.v("SERVER", "Deja activa");
                     }
                     else {
+                        Socket serviceSocket = new Socket("utcnist.colorado.edu", 13);
+                        BufferedReader serviceReader = Utilities.getReader(serviceSocket);
+
+                        //Log.v("SERVER", socket.getRemoteSocketAddress().toString().split(":")[0].substring(1) + " " + map.get(socket.getRemoteSocketAddress().toString().split(":")[0].substring(1)));
+
+                        String time = serviceReader.readLine();
+
+                        while (time == null || time.isEmpty()) {
+                            time = serviceReader.readLine();
+                        }
+
+                        serviceSocket.close();
+
+                        Date date = new SimpleDateFormat("yy-MM-dd HH:mm:ss").parse(time.substring(5, 22));
+
                         String ipTime = map.get(socket.getRemoteSocketAddress().toString().split(":")[0].substring(1));
 
                         if (date.getHours() > Integer.parseInt(ipTime.split(" ")[0]) || (date.getHours() == Integer.parseInt(ipTime.split(" ")[0]) && date.getMinutes() > Integer.parseInt(ipTime.split(" ")[1]))) {
